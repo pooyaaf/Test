@@ -1,4 +1,4 @@
-package SpringApplication;
+package application;
 
 import baloot.Baloot;
 import org.springframework.boot.SpringApplication;
