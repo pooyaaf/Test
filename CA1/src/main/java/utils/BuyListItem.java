@@ -1,5 +1,6 @@
-package domain;
+package utils;
 
+import domain.Commodity;
 import lombok.Getter;
 import lombok.Setter;
 

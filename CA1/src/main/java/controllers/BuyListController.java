@@ -1,7 +1,7 @@
 package controllers;
 
 import baloot.Baloot;
-import domain.BuyListItem;
+import utils.BuyListItem;
 import domain.Commodity;
 import domain.User;
 import exceptions.*;
