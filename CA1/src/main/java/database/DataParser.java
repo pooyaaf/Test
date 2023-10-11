@@ -16,6 +16,7 @@ import java.util.List;
 
 public class DataParser {
     private final ObjectMapper objectMapper = new ObjectMapper();
+    private final String dataPath = "src/main/java/database/data/";
     Database database;
 
     public DataParser(Database database) {
@@ -23,7 +24,7 @@ public class DataParser {
     }
 
     public void getUsersList() throws IOException {
-        String filePath = "src/main/java/database/data/users.json";
+        String filePath = dataPath + "users.json";
         String usersString = new String(Files.readAllBytes(Paths.get(filePath)));
 
         List<User> userList = objectMapper.readValue(usersString, new TypeReference<>() {
@@ -32,7 +33,7 @@ public class DataParser {
     }
 
     public void getProvidersList() throws IOException {
-        String filePath = "src/main/java/database/data/providers.json";
+        String filePath = dataPath + "providers.json";
         String providersString = new String(Files.readAllBytes(Paths.get(filePath)));
 
         List<Provider> providerList = objectMapper.readValue(providersString, new TypeReference<>() {
@@ -41,7 +42,7 @@ public class DataParser {
     }
 
     public void getCommoditiesList() throws IOException {
-        String filePath = "src/main/java/database/data/commodities.json";
+        String filePath = dataPath + "commodities.json";
         String commoditiesString = new String(Files.readAllBytes(Paths.get(filePath)));
 
         List<Commodity> commodityList = objectMapper.readValue(commoditiesString, new TypeReference<>() {
@@ -50,7 +51,7 @@ public class DataParser {
     }
 
     public void getCommentsList() throws IOException {
-        String filePath = "src/main/java/database/data/comments.json";
+        String filePath = dataPath + "comments.json";
         String commentsString = new String(Files.readAllBytes(Paths.get(filePath)));
 
         List<Comment> commentsList = objectMapper.readValue(commentsString, new TypeReference<>() {
