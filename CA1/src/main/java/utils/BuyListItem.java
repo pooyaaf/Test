@@ -1,6 +1,6 @@
 package utils;
 
-import domain.Commodity;
+import model.Commodity;
 import lombok.Getter;
 import lombok.Setter;
 

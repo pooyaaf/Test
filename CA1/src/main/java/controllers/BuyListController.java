@@ -1,9 +1,9 @@
 package controllers;
 
-import baloot.Baloot;
+import service.Baloot;
 import utils.BuyListItem;
-import domain.Commodity;
-import domain.User;
+import model.Commodity;
+import model.User;
 import exceptions.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

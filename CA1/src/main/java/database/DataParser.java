@@ -2,10 +2,10 @@ package database;
 
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import domain.Comment;
-import domain.Commodity;
-import domain.Provider;
-import domain.User;
+import model.Comment;
+import model.Commodity;
+import model.Provider;
+import model.User;
 
 import java.io.IOException;
 import java.nio.file.Files;

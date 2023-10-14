@@ -1,7 +1,7 @@
 package controllers;
 
-import baloot.Baloot;
-import domain.User;
+import service.Baloot;
+import model.User;
 import exceptions.InvalidCreditRange;
 import exceptions.NotExistentUser;
 import org.springframework.http.HttpStatus;

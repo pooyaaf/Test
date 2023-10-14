@@ -1,8 +1,8 @@
 package controllers;
 
-import baloot.Baloot;
-import domain.Commodity;
-import domain.Provider;
+import service.Baloot;
+import model.Commodity;
+import model.Provider;
 import exceptions.NotExistentProvider;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

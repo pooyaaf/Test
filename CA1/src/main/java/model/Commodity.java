@@ -1,4 +1,4 @@
-package domain;
+package model;
 
 import exceptions.NotInStock;
 import lombok.Getter;

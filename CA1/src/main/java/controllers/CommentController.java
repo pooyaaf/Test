@@ -1,7 +1,7 @@
 package controllers;
 
-import baloot.Baloot;
-import domain.Comment;
+import service.Baloot;
+import model.Comment;
 import exceptions.NotExistentComment;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

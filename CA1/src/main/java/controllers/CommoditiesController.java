@@ -1,9 +1,9 @@
 package controllers;
 
-import baloot.Baloot;
-import domain.Comment;
-import domain.Commodity;
-import domain.User;
+import service.Baloot;
+import model.Comment;
+import model.Commodity;
+import model.User;
 import exceptions.NotExistentCommodity;
 import exceptions.NotExistentUser;
 import org.springframework.http.HttpStatus;
