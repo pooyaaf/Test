@@ -40,6 +40,6 @@ public class Commodity {
             sum += entry.getValue();
         }
 
-        this.rating = ((this.initRate + sum) / (this.userRate.size() + 1));
+        this.rating = ((this.initRate + sum) / (this.userRate.size()));
     }
 }
