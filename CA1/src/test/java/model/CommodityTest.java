@@ -1,4 +1,4 @@
-package commodity;
+package model;
 
 import exceptions.CommodityIsNotInBuyList;
 import exceptions.InsufficientCredit;
