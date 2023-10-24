@@ -139,6 +139,18 @@ public class UserTest {
     }
 
     @Test
+    void test_remove_item_from_buyList_WhenQuantityMoreThan1() throws CommodityIsNotInBuyList {
+        Commodity commodity = new Commodity();
+        commodity.setId("commodityId");
+        user.addBuyItem(commodity);
+        user.addBuyItem(commodity);
+        user.addBuyItem(commodity);
+
+        user.removeItemFromBuyList(commodity);
+        Assertions.assertEquals(2 ,user.getBuyList().get("commodityId"));
+    }
+
+    @Test
     void reject_removing_non_existing_item_from_buyList(){
         Commodity commodity = new Commodity();
         commodity.setId("commodityId");
