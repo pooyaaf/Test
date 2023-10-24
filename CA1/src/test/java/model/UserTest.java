@@ -16,6 +16,15 @@ public class UserTest {
     }
 
     @Test
+    void test_user_constructor() {
+        Assertions.assertEquals("username", user.getUsername());
+        Assertions.assertEquals("password", user.getPassword());
+        Assertions.assertEquals("email", user.getEmail());
+        Assertions.assertEquals("01/01/1899", user.getBirthDate());
+        Assertions.assertEquals("1 St Jones", user.getAddress());
+    }
+
+    @Test
     void test_add_credit() throws InvalidCreditRange {
         user.addCredit(100);
         Assertions.assertEquals(100, user.getCredit(), 100);
