@@ -7,6 +7,8 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
+import java.util.Map;
+
 public class UserTest {
     private User user;
     @BeforeEach
@@ -84,12 +86,23 @@ public class UserTest {
     }
 
     @Test
-    void test_add_item_to_buyList(){
+    void test_addBuyItem_NotExistInBuyList(){
         Commodity commodity = new Commodity();
         commodity.setId("1");
         user.addBuyItem(commodity);
         Assertions.assertEquals(1, user.getBuyList().get("1"));
+    }
 
+    @Test
+    void test_addBuyItem_ExistInBuyList(){
+        Commodity commodity = new Commodity();
+        commodity.setId("5");
+        Map<String, Integer> buyList = user.getBuyList();
+        buyList.put("5", 3);
+        user.setBuyList(buyList);
+
+        user.addBuyItem(commodity);
+        Assertions.assertEquals(3 + 1, user.getBuyList().get("5"));
     }
 
     @Test
@@ -101,9 +114,19 @@ public class UserTest {
 
 
     @Test
-    void test_add_purchasedItem() {
+    void test_addPurchasedItem_NotExistInPurchasedItem() {
         user.addPurchasedItem("commodityId", 20);
         Assertions.assertEquals(20, user.getPurchasedList().get("commodityId"));
+    }
+
+    @Test
+    void test_addPurchasedItem_ExistInPurchasedItem() {
+        Map<String, Integer> purchasedList = user.getPurchasedList();
+        purchasedList.put("commodityId", 10);
+        user.setPurchasedList(purchasedList);
+
+        user.addPurchasedItem("commodityId", 20);
+        Assertions.assertEquals(10 + 20, user.getPurchasedList().get("commodityId"));
     }
 
     @Test
