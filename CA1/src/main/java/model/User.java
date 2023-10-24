@@ -59,11 +59,16 @@ public class User {
     }
 
     public void addPurchasedItem(String id, int quantity) {
+        if (quantity < 0) {
+            throw new IllegalArgumentException("Quantity cannot be negative.");
+        }
+
         if (this.purchasedList.containsKey(id)) {
             int existingQuantity = this.purchasedList.get(id);
             this.purchasedList.put(id, existingQuantity + quantity);
-        } else
+        } else {
             this.purchasedList.put(id, quantity);
+        }
     }
 
     public void removeItemFromBuyList(Commodity commodity) throws CommodityIsNotInBuyList {

@@ -9,6 +9,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.util.Map;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 public class UserTest {
     private User user;
     @BeforeEach
@@ -41,7 +43,7 @@ public class UserTest {
         float amount = (float) (Math.random() * -100);
         System.out.println("amount: " + amount);
         System.out.println("credit: " + user.getCredit());
-        Assertions.assertThrows(InvalidCreditRange.class, () -> user.addCredit(amount));
+        assertThrows(InvalidCreditRange.class, () -> user.addCredit(amount));
     }
 
     @ParameterizedTest
@@ -69,7 +71,7 @@ public class UserTest {
     })
     void test_withdraw_credit_SadPath_NegAmount(float amount, float pre_credit) {
         user.setCredit(pre_credit);
-        Assertions.assertThrows(IllegalArgumentException.class, () -> user.withdrawCredit(amount));
+        assertThrows(IllegalArgumentException.class, () -> user.withdrawCredit(amount));
     }
 
     @ParameterizedTest
@@ -82,7 +84,7 @@ public class UserTest {
     })
     void test_withdraw_credit_SadPath_InsufficientCredit(float amount, float pre_credit) {
         user.setCredit(pre_credit);
-        Assertions.assertThrows(InsufficientCredit.class, () -> user.withdrawCredit(amount));
+        assertThrows(InsufficientCredit.class, () -> user.withdrawCredit(amount));
     }
 
     @Test
@@ -130,6 +132,13 @@ public class UserTest {
     }
 
     @Test
+    public void test_addPurchasedItem_WithNegativeQuantity_Exception_thrown() {
+        assertThrows(IllegalArgumentException.class, () -> {
+            user.addPurchasedItem("item3", -1);
+        });
+    }
+
+    @Test
     void test_remove_item_from_buyList() throws CommodityIsNotInBuyList {
         Commodity commodity = new Commodity();
         commodity.setId("commodityId");
@@ -137,6 +146,7 @@ public class UserTest {
         user.removeItemFromBuyList(commodity);
         Assertions.assertNull(user.getBuyList().get("commodityId"));
     }
+
 
     @Test
     void test_remove_item_from_buyList_WhenQuantityMoreThan1() throws CommodityIsNotInBuyList {
@@ -154,7 +164,7 @@ public class UserTest {
     void reject_removing_non_existing_item_from_buyList(){
         Commodity commodity = new Commodity();
         commodity.setId("commodityId");
-        Assertions.assertThrows(CommodityIsNotInBuyList.class, () -> user.removeItemFromBuyList(commodity));
+        assertThrows(CommodityIsNotInBuyList.class, () -> user.removeItemFromBuyList(commodity));
     }
 
     @AfterEach
