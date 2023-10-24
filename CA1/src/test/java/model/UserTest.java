@@ -57,10 +57,30 @@ public class UserTest {
         Assertions.assertEquals(pre_credit - amount, user.getCredit());
     }
 
-    @Test
-    void reject_withdraw_more_credit_than_available() throws InvalidCreditRange {
-        user.addCredit(100);
-        Assertions.assertThrows(InsufficientCredit.class, () -> user.withdrawCredit(200));
+    @ParameterizedTest
+    @CsvSource({
+            "-100, 200",
+            "-3, 4",
+            "-50, 50",
+            "-98, 0",
+            "-111, 444"
+    })
+    void test_withdraw_credit_SadPath_NegAmount(float amount, float pre_credit) {
+        user.setCredit(pre_credit);
+        Assertions.assertThrows(IllegalArgumentException.class, () -> user.withdrawCredit(amount));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "200, 100",
+            "4, 3",
+            "51, 50",
+            "98, 90",
+            "111, 44"
+    })
+    void test_withdraw_credit_SadPath_InsufficientCredit(float amount, float pre_credit) {
+        user.setCredit(pre_credit);
+        Assertions.assertThrows(InsufficientCredit.class, () -> user.withdrawCredit(amount));
     }
 
     @Test
