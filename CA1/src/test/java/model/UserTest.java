@@ -3,11 +3,9 @@ package model;
 import exceptions.CommodityIsNotInBuyList;
 import exceptions.InsufficientCredit;
 import exceptions.InvalidCreditRange;
-import model.Commodity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import model.User;
 import org.junit.jupiter.api.Assertions;
 
 public class UserTest {
@@ -25,9 +23,7 @@ public class UserTest {
 
     @Test
     void reject_negative_credit() {
-        Assertions.assertThrows(InvalidCreditRange.class, () -> {
-            user.addCredit(-50);
-        });
+        Assertions.assertThrows(InvalidCreditRange.class, () -> user.addCredit(-50));
     }
 
     @Test
@@ -40,9 +36,7 @@ public class UserTest {
     @Test
     void reject_withdraw_more_credit_than_available() throws InvalidCreditRange {
         user.addCredit(100);
-        Assertions.assertThrows(InsufficientCredit.class, () -> {
-            user.withdrawCredit(200);
-        });
+        Assertions.assertThrows(InsufficientCredit.class, () -> user.withdrawCredit(200));
     }
 
     @Test
@@ -58,7 +52,7 @@ public class UserTest {
     void test_add_item_to_buyList_without_id(){
         Commodity commodity = new Commodity();
         user.addBuyItem(commodity);
-        Assertions.assertEquals(null, user.getBuyList().get("null"));
+        Assertions.assertNull(user.getBuyList().get("null"));
     }
 
 
@@ -81,9 +75,7 @@ public class UserTest {
     void reject_removing_non_existing_item_from_buyList(){
         Commodity commodity = new Commodity();
         commodity.setId("commodityId");
-        Assertions.assertThrows(CommodityIsNotInBuyList.class, () -> {
-            user.removeItemFromBuyList(commodity);
-        });
+        Assertions.assertThrows(CommodityIsNotInBuyList.class, () -> user.removeItemFromBuyList(commodity));
     }
 
     @AfterEach
