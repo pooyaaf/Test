@@ -4,6 +4,9 @@ import exceptions.CommodityIsNotInBuyList;
 import exceptions.InsufficientCredit;
 import exceptions.InvalidCreditRange;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 public class UserTest {
     private User user;
     @BeforeEach
@@ -39,11 +42,19 @@ public class UserTest {
         Assertions.assertThrows(InvalidCreditRange.class, () -> user.addCredit(amount));
     }
 
-    @Test
-    void test_withdraw_credit() throws InvalidCreditRange, InsufficientCredit {
-        user.addCredit(200);
-        user.withdrawCredit(100);
-        Assertions.assertEquals(100, user.getCredit());
+    @ParameterizedTest
+    @CsvSource({
+            "100, 200",
+            "3, 4",
+            "50, 50",
+            "98, 98",
+            "111, 444"
+    })
+    void test_withdraw_credit_HappyPath(float amount, float pre_credit) throws InsufficientCredit {
+        user.setCredit(pre_credit);
+        user.withdrawCredit(amount);
+
+        Assertions.assertEquals(pre_credit - amount, user.getCredit());
     }
 
     @Test

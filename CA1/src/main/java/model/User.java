@@ -43,6 +43,8 @@ public class User {
     public void withdrawCredit(float amount) throws InsufficientCredit {
         if (amount > this.credit)
             throw new InsufficientCredit();
+        if (amount < 0)
+            throw new IllegalArgumentException("amount argument in withdrawCredit() must be positive");
 
         this.credit -= amount;
     }
