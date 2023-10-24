@@ -5,6 +5,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import java.util.ArrayList;
 
 public class CommodityTest {
@@ -26,15 +28,49 @@ public class CommodityTest {
         commodity.setCategories(categories);
     }
 
-    @Test
-    void test_update_inStock() throws NotInStock {
-        commodity.updateInStock(5);
-        Assertions.assertEquals(15, commodity.getInStock());
+
+//   updateInStock tests
+    @ParameterizedTest
+    @CsvSource({
+            "2, 12",
+            "3, 20",
+            "10, 1",
+            "0, 10",
+            "10, 0",
+    })
+    void test_update_inStock_WhenNewInStockIsPos(int InStock, int amount) throws NotInStock {
+        commodity.setInStock(InStock);
+        commodity.updateInStock(amount);
+        Assertions.assertEquals(InStock + amount, commodity.getInStock());
     }
-    @Test
-    void reject_update_inStock_negative() {
-        Assertions.assertThrows(NotInStock.class, () -> commodity.updateInStock(-15));
+
+    @ParameterizedTest
+    @CsvSource({
+            "2, -12",
+            "3, -20",
+            "10, -11",
+            "0, -10",
+            "10, -100"
+    })
+    void test_update_inStock_WhenNewInStockIsNeg(int InStock, int amount){
+        commodity.setInStock(InStock);
+        Assertions.assertThrows(NotInStock.class, () -> commodity.updateInStock(amount));
     }
+
+    @ParameterizedTest
+    @CsvSource({
+            "2, -2",
+            "3, -3",
+            "10, -10",
+            "0, 0",
+            "10, -10"
+    })
+    void test_update_inStock_WhenNewInStockIsZero(int InStock, int amount) throws NotInStock {
+        commodity.setInStock(InStock);
+        commodity.updateInStock(amount);
+        Assertions.assertEquals(0, commodity.getInStock());
+    }
+
 
     @Test
     void test_add_rate() {
