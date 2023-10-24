@@ -35,6 +35,13 @@ public class CommentTest {
         Assertions.assertEquals(text, comment.getText());
     }
 
+    @Test
+    void testGetCurrentDate() {
+        Date now = new Date();
+        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+        Assertions.assertEquals(dateFormat.format(now), comment.getCurrentDate());
+    }
+
     @AfterEach
     void tearDown() {
         comment = null;
