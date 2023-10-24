@@ -30,6 +30,8 @@ public class Commodity {
     }
 
     public void addRate(String username, int score) {
+        if (score < 1 || score > 10)
+            throw new IllegalArgumentException("Score must be between 1 and 10");
         userRate.put(username, score);
         this.calcRating();
     }
@@ -40,6 +42,6 @@ public class Commodity {
             sum += entry.getValue();
         }
 
-        this.rating = ((this.initRate + sum) / (this.userRate.size()));
+        this.rating = ((this.initRate + sum) / (this.userRate.size() + 1));
     }
 }
