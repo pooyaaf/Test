@@ -3,11 +3,7 @@ package model;
 import exceptions.CommodityIsNotInBuyList;
 import exceptions.InsufficientCredit;
 import exceptions.InvalidCreditRange;
-import org.junit.jupiter.api.AfterEach;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.Assertions;
-
+import org.junit.jupiter.api.*;
 public class UserTest {
     private User user;
     @BeforeEach
@@ -24,10 +20,15 @@ public class UserTest {
         Assertions.assertEquals("1 St Jones", user.getAddress());
     }
 
-    @Test
-    void test_add_credit() throws InvalidCreditRange {
-        user.addCredit(100);
-        Assertions.assertEquals(100, user.getCredit(), 100);
+    @RepeatedTest(20)
+    void test_add_credit_HappyPath() throws InvalidCreditRange {
+        float amount = (float) (Math.random() * 100);
+        float pre_credit = user.getCredit();
+        System.out.println("pre_credit: " + pre_credit);
+        System.out.println("amount: " + amount);
+
+        user.addCredit(amount);
+        Assertions.assertEquals(pre_credit + amount, user.getCredit());
     }
 
     @Test
