@@ -31,9 +31,12 @@ public class UserTest {
         Assertions.assertEquals(pre_credit + amount, user.getCredit());
     }
 
-    @Test
-    void reject_negative_credit() {
-        Assertions.assertThrows(InvalidCreditRange.class, () -> user.addCredit(-50));
+    @RepeatedTest(20)
+    void test_add_credit_SadPath() {
+        float amount = (float) (Math.random() * -100);
+        System.out.println("amount: " + amount);
+        System.out.println("credit: " + user.getCredit());
+        Assertions.assertThrows(InvalidCreditRange.class, () -> user.addCredit(amount));
     }
 
     @Test
