@@ -6,6 +6,8 @@ import org.junit.jupiter.params.provider.CsvSource;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class CommentTest {
     private Comment comment;
@@ -18,6 +20,14 @@ public class CommentTest {
         comment.setUsername("username");
         comment.setCommodityId(1);
         comment.setText("text");
+        // Add user votes
+        Map<String, String> userVote = new HashMap<>();
+        userVote.put("user1", "like");
+        userVote.put("user2", "dislike");
+        userVote.put("user3", "like");
+        comment.setUserVote(userVote);
+        comment.setLike(2);
+        comment.setDislike(1);
     }
 
     @ParameterizedTest
@@ -40,6 +50,34 @@ public class CommentTest {
         Date now = new Date();
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Assertions.assertEquals(dateFormat.format(now), comment.getCurrentDate());
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "user5, dislike",
+            "user6, like",
+    })
+    void testAddUserVote(String userName, String vote) {
+        System.out.println("vote: " + vote);
+
+        int pre_like = comment.getLike();
+        int pre_dislike = comment.getDislike();
+
+        System.out.println("pre_like: " + pre_like);
+        System.out.println("pre_dislike: " + pre_dislike);
+
+        comment.addUserVote(userName, vote);
+
+        System.out.println("like: " + comment.getLike());
+        System.out.println("dislike: " + comment.getDislike());
+
+        if (vote.equals("like")) {
+            Assertions.assertEquals(pre_like + 1, comment.getLike());
+            Assertions.assertEquals(pre_dislike, comment.getDislike());
+        } else if (vote.equals("dislike")) {
+            Assertions.assertEquals(pre_like, comment.getLike());
+            Assertions.assertEquals(pre_dislike + 1, comment.getDislike());
+        }
     }
 
     @AfterEach
