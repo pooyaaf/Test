@@ -1,16 +1,10 @@
 package model;
 
-import exceptions.CommodityIsNotInBuyList;
-import exceptions.InsufficientCredit;
-import exceptions.InvalidCreditRange;
 import exceptions.NotInStock;
-import model.Commodity;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import model.User;
 import org.junit.jupiter.api.Assertions;
-
 import java.util.ArrayList;
 
 public class CommodityTest {
@@ -39,9 +33,7 @@ public class CommodityTest {
     }
     @Test
     void reject_update_inStock_negative() {
-        Assertions.assertThrows(NotInStock.class, () -> {
-            commodity.updateInStock(-15);
-        });
+        Assertions.assertThrows(NotInStock.class, () -> commodity.updateInStock(-15));
     }
 
     @Test
