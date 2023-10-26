@@ -13,12 +13,15 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.server.ResponseStatusException;
 import service.Baloot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 
@@ -128,5 +131,65 @@ public class CommoditiesControllerTest {
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
     }
 
+   // Todo - addCommodityComment
+
+    @Test
+    public void test_getCommodityComment() {
+        String commodityId = "1";
+        ArrayList<Comment> sampleComments = new ArrayList<>();
+
+        when(baloot.getCommentsForCommodity(Integer.parseInt(commodityId))).thenReturn(sampleComments);
+
+        ResponseEntity<ArrayList<Comment>> response = commoditiesController.getCommodityComment(commodityId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+    }
+    @Test
+    public void test_searchCommoditiesByName() {
+        String searchOption = "name";
+        String searchValue = "SampleName";
+
+        ArrayList<Commodity> sampleCommodities = new ArrayList<>();
+
+        when(baloot.filterCommoditiesByName(searchValue)).thenReturn(sampleCommodities);
+
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("searchOption", searchOption);
+        requestBody.put("searchValue", searchValue);
+
+        ResponseEntity<ArrayList<Commodity>> response = commoditiesController.searchCommodities(requestBody);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    }
+    @Test
+    public void test_getSuggestedCommodities_Success() throws NotExistentCommodity {
+        String commodityId = "1";
+
+        Commodity sampleCommodity = new Commodity();
+        sampleCommodity.setId(commodityId);
+
+        ArrayList<Commodity> suggestedCommodities = new ArrayList<>();
+
+
+        when(baloot.getCommodityById(commodityId)).thenReturn(sampleCommodity);
+        when(baloot.suggestSimilarCommodities(sampleCommodity)).thenReturn(suggestedCommodities);
+
+        ResponseEntity<ArrayList<Commodity>> response = commoditiesController.getSuggestedCommodities(commodityId);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+
+    }
+
+    @Test
+    public void test_getSuggestedCommodities_NotExistentCommodity() throws NotExistentCommodity {
+        String commodityId = "NotExistentCommodity";
+
+        when(baloot.getCommodityById(commodityId)).thenThrow(new NotExistentCommodity());
+
+        ResponseEntity<ArrayList<Commodity>> response = commoditiesController.getSuggestedCommodities(commodityId);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+    }
 
 }
