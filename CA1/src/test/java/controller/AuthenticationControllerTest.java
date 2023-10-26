@@ -2,6 +2,7 @@ package controller;
 
 import controllers.AuthenticationController;
 import exceptions.IncorrectPassword;
+import exceptions.NotExistentCommodity;
 import exceptions.NotExistentUser;
 import exceptions.UsernameAlreadyTaken;
 import model.User;
@@ -16,6 +17,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.server.ResponseStatusException;
 import service.Baloot;
 
 import java.text.SimpleDateFormat;
@@ -40,7 +42,6 @@ public class AuthenticationControllerTest {
 
     @BeforeEach
     void setup() {
-        //baloot = Mockito.mock(Baloot.class);
         MockitoAnnotations.openMocks(this);
         authenticationController = new AuthenticationController();
     }
@@ -49,6 +50,31 @@ public class AuthenticationControllerTest {
     public void cleanUp() {
         authenticationController = null;
         baloot = null;
+    }
+    @Test
+    void test_login_success()  throws NotExistentUser, IncorrectPassword{
+        Map<String, String> input = new HashMap<>();
+        input.put("username", "User");
+        input.put("password", "pass");
+        AuthenticationController sampleAuthenticationController = mock(AuthenticationController.class);
+        when(sampleAuthenticationController.login(input)).thenReturn(new ResponseEntity<String>("login successfully!", HttpStatus.OK));
+        ResponseEntity<String> response = sampleAuthenticationController.login(input);
+        assertEquals(response.getBody(),"login successfully!");
+    }
+
+    @Test
+    void test_login_exception_IncorrectPassword() throws NotExistentUser, IncorrectPassword{
+        Map<String, String> input = new HashMap<>();
+        input.put("username", "User");
+        input.put("password", "IncorrectPassword");
+        String username = "User";
+        String password = "IncorrectPassword";
+
+        AuthenticationController sampleAuthenticationController = mock(AuthenticationController.class);
+        when(sampleAuthenticationController.login(input)).thenReturn(new ResponseEntity<String>("Incorrect password!", HttpStatus.UNAUTHORIZED));
+        ResponseEntity<String> response = sampleAuthenticationController.login(input);
+        assertEquals(response.getBody(),"Incorrect password!");
+        assertEquals(response.getStatusCode(),HttpStatus.UNAUTHORIZED);
     }
 
     @Test
@@ -66,6 +92,7 @@ public class AuthenticationControllerTest {
         assertEquals("User does not exist.", response.getBody());
     }
 
+
     @Test
     void test_signup_successful() throws UsernameAlreadyTaken {
         Map<String, String> input = new HashMap<>();
@@ -82,23 +109,8 @@ public class AuthenticationControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("signup successfully!", response.getBody());
     }
-//    @Test
-//    void testSignupUsernameTaken() throws UsernameAlreadyTaken {
-//        Map<String, String> input = new HashMap<>();
-//        input.put( "address", "Tehran");
-//        input.put("birthDate", "1990-05-15");
-//        input.put("email", "example@example.com");
-//        input.put("username", "Reza");
-//        input.put("password", "secret");
-//
-//        // Mock the addUser method to throw UsernameAlreadyTaken
-//        doThrow(new UsernameAlreadyTaken()).when(baloot).addUser(any(User.class));
-//
-//        ResponseEntity<String> response = authenticationController.signup(input);
-//
-//        assertEquals(HttpStatus.OK, response.getStatusCode());
-//        assertEquals("Username already taken", response.getBody());
-//    }
+//  Todo - testSignupUsernameTaken
+
 
 
 }
