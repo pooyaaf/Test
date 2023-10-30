@@ -1,6 +1,5 @@
 package controller;
 
-import controllers.CommentController;
 import controllers.CommoditiesController;
 import exceptions.NotExistentCommodity;
 import model.Comment;
@@ -13,7 +12,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.server.ResponseStatusException;
 import service.Baloot;
 
 import java.util.ArrayList;
@@ -21,7 +19,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.Mockito.*;
 
 
@@ -86,7 +84,7 @@ public class CommoditiesControllerTest {
         });
         ResponseEntity<Commodity> response = commoditiesController.getCommodity(commodityId);
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals(null, response.getBody());
+        assertNull(response.getBody());
 
     }
 

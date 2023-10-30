@@ -2,34 +2,17 @@ package controller;
 
 import controllers.AuthenticationController;
 import exceptions.IncorrectPassword;
-import exceptions.NotExistentCommodity;
 import exceptions.NotExistentUser;
 import exceptions.UsernameAlreadyTaken;
 import model.User;
 import org.junit.jupiter.api.*;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.MockitoAnnotations;
-import org.mockito.internal.stubbing.BaseStubbing;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.server.ResponseStatusException;
 import service.Baloot;
-
-import java.text.SimpleDateFormat;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.stream.Stream;
-
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
@@ -52,18 +35,18 @@ public class AuthenticationControllerTest {
         baloot = null;
     }
     @Test
-    void test_login_success()  throws NotExistentUser, IncorrectPassword{
+    void test_login_success() {
         Map<String, String> input = new HashMap<>();
         input.put("username", "User");
         input.put("password", "pass");
         AuthenticationController sampleAuthenticationController = mock(AuthenticationController.class);
-        when(sampleAuthenticationController.login(input)).thenReturn(new ResponseEntity<String>("login successfully!", HttpStatus.OK));
+        when(sampleAuthenticationController.login(input)).thenReturn(new ResponseEntity<>("login successfully!", HttpStatus.OK));
         ResponseEntity<String> response = sampleAuthenticationController.login(input);
         assertEquals(response.getBody(),"login successfully!");
     }
 
     @Test
-    void test_login_exception_IncorrectPassword() throws NotExistentUser, IncorrectPassword{
+    void test_login_exception_IncorrectPassword() {
         Map<String, String> input = new HashMap<>();
         input.put("username", "User");
         input.put("password", "IncorrectPassword");
@@ -71,7 +54,7 @@ public class AuthenticationControllerTest {
         String password = "IncorrectPassword";
 
         AuthenticationController sampleAuthenticationController = mock(AuthenticationController.class);
-        when(sampleAuthenticationController.login(input)).thenReturn(new ResponseEntity<String>("Incorrect password!", HttpStatus.UNAUTHORIZED));
+        when(sampleAuthenticationController.login(input)).thenReturn(new ResponseEntity<>("Incorrect password!", HttpStatus.UNAUTHORIZED));
         ResponseEntity<String> response = sampleAuthenticationController.login(input);
         assertEquals(response.getBody(),"Incorrect password!");
         assertEquals(response.getStatusCode(),HttpStatus.UNAUTHORIZED);
