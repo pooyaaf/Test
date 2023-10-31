@@ -251,6 +251,7 @@ public class CommoditiesControllerTest {
         ResponseEntity<ArrayList<Commodity>> response = commoditiesController.getSuggestedCommodities(commodityId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(suggestedCommodities, response.getBody());
 
     }
 
@@ -263,6 +264,7 @@ public class CommoditiesControllerTest {
         ResponseEntity<ArrayList<Commodity>> response = commoditiesController.getSuggestedCommodities(commodityId);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(new ArrayList<Commodity>(), response.getBody());
     }
 
 }
