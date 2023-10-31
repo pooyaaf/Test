@@ -1,9 +1,12 @@
 package controller;
 
 import controllers.CommoditiesController;
+import defines.Errors;
 import exceptions.NotExistentCommodity;
+import exceptions.NotExistentUser;
 import model.Comment;
 import model.Commodity;
+import model.User;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -98,7 +101,6 @@ public class CommoditiesControllerTest {
         sampleCommodity.setId(commodityId);
 
         when(baloot.getCommodityById(commodityId)).thenReturn(sampleCommodity);
-
         ResponseEntity<String> response = commoditiesController.rateCommodity(commodityId, requestBody);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
@@ -109,13 +111,11 @@ public class CommoditiesControllerTest {
         String commodityId = "NotExistentCommodity";
         Map<String, String> requestBody = Map.of("username", "user1", "rate", "5");
 
-        when(baloot.getCommodityById(commodityId)).thenAnswer(invocation -> {
-            throw new NotExistentCommodity();
-        });
-
+        when(baloot.getCommodityById(commodityId)).thenThrow(new NotExistentCommodity());
         ResponseEntity<String> response = commoditiesController.rateCommodity(commodityId, requestBody);
 
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(Errors.NOT_EXISTENT_COMMODITY, response.getBody());
     }
 
     @Test
@@ -124,13 +124,32 @@ public class CommoditiesControllerTest {
         Map<String, String> requestBody = Map.of("username", "user1", "rate", "invalid_rate");
 
         when(baloot.getCommodityById(commodityId)).thenReturn(new Commodity());
-
         ResponseEntity<String> response = commoditiesController.rateCommodity(commodityId, requestBody);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        System.out.println("For input string: \"invalid_rate\"" + response.getBody());
     }
 
-   // Todo - addCommodityComment
+    // Todo - rateCommodity_rateOutOfRange
+
+    @Test
+    public void test_addCommodityComment_success() throws NotExistentUser {
+        String commodityId = "1";
+        Map<String, String> requestBody = Map.of("username", "user1", "comment", "comment1");
+
+        User sampleUser = new User("user1", "password1", "email@gmail.com", "2000-01-01", "address1");
+        when(baloot.getUserById("user1")).thenReturn(sampleUser);
+
+        when(baloot.generateCommentId()).thenReturn(1);
+        doNothing().when(baloot).addComment(any(Comment.class));
+        ResponseEntity<String> response = commoditiesController.addCommodityComment(commodityId, requestBody);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals("comment added successfully!", response.getBody());
+    }
+
+   // Todo - addCommodityComment exception
+
 
     @Test
     public void test_getCommodityComment() {
