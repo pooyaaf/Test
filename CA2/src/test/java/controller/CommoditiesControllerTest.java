@@ -130,8 +130,6 @@ public class CommoditiesControllerTest {
         System.out.println("For input string: \"invalid_rate\"" + response.getBody());
     }
 
-    // Todo - rateCommodity_rateOutOfRange
-
     @Test
     public void test_addCommodityComment_success() throws NotExistentUser {
         String commodityId = "1";
@@ -175,8 +173,6 @@ public class CommoditiesControllerTest {
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals(sampleComments, response.getBody());
     }
-
-    // Todo - test_getCommodityComment_NotExistentCommodity
 
     @Test
     public void test_searchCommoditiesByName() {
