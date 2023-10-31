@@ -6,8 +6,11 @@ import exceptions.NotExistentUser;
 import exceptions.UsernameAlreadyTaken;
 import model.User;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import service.Baloot;
@@ -16,17 +19,19 @@ import java.util.Map;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
+@ExtendWith(MockitoExtension.class)
 public class AuthenticationControllerTest {
 
     @Mock
     private Baloot baloot;
-
+    @InjectMocks
     private AuthenticationController authenticationController;
 
     @BeforeEach
     void setup() {
         MockitoAnnotations.openMocks(this);
         authenticationController = new AuthenticationController();
+        authenticationController.setBaloot(baloot);
     }
 
     @AfterEach
@@ -35,14 +40,16 @@ public class AuthenticationControllerTest {
         baloot = null;
     }
     @Test
-    void test_login_success() {
+    void test_login_success() throws NotExistentUser, IncorrectPassword {
         Map<String, String> input = new HashMap<>();
         input.put("username", "User");
         input.put("password", "pass");
-        AuthenticationController sampleAuthenticationController = mock(AuthenticationController.class);
-        when(sampleAuthenticationController.login(input)).thenReturn(new ResponseEntity<>("login successfully!", HttpStatus.OK));
-        ResponseEntity<String> response = sampleAuthenticationController.login(input);
+
+        doNothing().when(baloot).login(anyString(), anyString());
+        ResponseEntity<String> response = authenticationController.login(input);
+
         assertEquals(response.getBody(),"login successfully!");
+        assertEquals(response.getStatusCode(),HttpStatus.OK);
     }
 
     @Test
