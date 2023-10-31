@@ -127,7 +127,7 @@ public class CommoditiesControllerTest {
         ResponseEntity<String> response = commoditiesController.rateCommodity(commodityId, requestBody);
 
         assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
-        System.out.println("For input string: \"invalid_rate\"" + response.getBody());
+        assertEquals("For input string: \"invalid_rate\"", response.getBody());
     }
 
     @Test
