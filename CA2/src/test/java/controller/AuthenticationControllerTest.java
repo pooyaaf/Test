@@ -1,6 +1,7 @@
 package controller;
 
 import controllers.AuthenticationController;
+import defines.Errors;
 import exceptions.IncorrectPassword;
 import exceptions.NotExistentUser;
 import exceptions.UsernameAlreadyTaken;
@@ -53,17 +54,15 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void test_login_exception_IncorrectPassword() {
+    void test_login_exception_IncorrectPassword() throws NotExistentUser, IncorrectPassword {
         Map<String, String> input = new HashMap<>();
         input.put("username", "User");
         input.put("password", "IncorrectPassword");
-        String username = "User";
-        String password = "IncorrectPassword";
 
-        AuthenticationController sampleAuthenticationController = mock(AuthenticationController.class);
-        when(sampleAuthenticationController.login(input)).thenReturn(new ResponseEntity<>("Incorrect password!", HttpStatus.UNAUTHORIZED));
-        ResponseEntity<String> response = sampleAuthenticationController.login(input);
-        assertEquals(response.getBody(),"Incorrect password!");
+        doThrow(new IncorrectPassword()).when(baloot).login(input.get("username"), input.get("password"));
+        ResponseEntity<String> response = authenticationController.login(input);
+
+        assertEquals(response.getBody(), Errors.INCORRECT_PASSWORD);
         assertEquals(response.getStatusCode(),HttpStatus.UNAUTHORIZED);
     }
 
