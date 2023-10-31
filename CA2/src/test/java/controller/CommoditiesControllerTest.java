@@ -13,6 +13,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.mockito.internal.matchers.Null;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import service.Baloot;
@@ -21,8 +22,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 
@@ -173,25 +173,68 @@ public class CommoditiesControllerTest {
         ResponseEntity<ArrayList<Comment>> response = commoditiesController.getCommodityComment(commodityId);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(sampleComments, response.getBody());
     }
+
+    // Todo - test_getCommodityComment_NotExistentCommodity
+
     @Test
     public void test_searchCommoditiesByName() {
-        String searchOption = "name";
-        String searchValue = "SampleName";
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("searchOption", "name");
+        requestBody.put("searchValue", "SampleName");
 
         ArrayList<Commodity> sampleCommodities = new ArrayList<>();
-
-        when(baloot.filterCommoditiesByName(searchValue)).thenReturn(sampleCommodities);
-
-        Map<String, String> requestBody = new HashMap<>();
-        requestBody.put("searchOption", searchOption);
-        requestBody.put("searchValue", searchValue);
+        when(baloot.filterCommoditiesByName(requestBody.get("searchValue"))).thenReturn(sampleCommodities);
 
         ResponseEntity<ArrayList<Commodity>> response = commoditiesController.searchCommodities(requestBody);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
-
+        assertEquals(sampleCommodities, response.getBody());
     }
+
+    @Test
+    public void test_searchCommoditiesByCategory() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("searchOption", "category");
+        requestBody.put("searchValue", "SampleCategory");
+
+        ArrayList<Commodity> sampleCommodities = new ArrayList<>();
+        when(baloot.filterCommoditiesByName(requestBody.get("searchValue"))).thenReturn(sampleCommodities);
+
+        ResponseEntity<ArrayList<Commodity>> response = commoditiesController.searchCommodities(requestBody);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(sampleCommodities, response.getBody());
+    }
+
+    @Test
+    public void test_searchCommoditiesByProvider() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("searchOption", "category");
+        requestBody.put("searchValue", "SampleProvider");
+
+        ArrayList<Commodity> sampleCommodities = new ArrayList<>();
+        when(baloot.filterCommoditiesByName(requestBody.get("searchValue"))).thenReturn(sampleCommodities);
+
+        ResponseEntity<ArrayList<Commodity>> response = commoditiesController.searchCommodities(requestBody);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(sampleCommodities, response.getBody());
+    }
+
+    @Test
+    public void test_searchCommoditiesByNothing() {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("searchOption", "Nothing");
+        requestBody.put("searchValue", "SampleNothing");
+
+        ResponseEntity<ArrayList<Commodity>> response = commoditiesController.searchCommodities(requestBody);
+
+        assertEquals(HttpStatus.OK, response.getStatusCode());
+        assertEquals(new ArrayList<Commodity>(), response.getBody());
+    }
+
     @Test
     public void test_getSuggestedCommodities_Success() throws NotExistentCommodity {
         String commodityId = "1";
