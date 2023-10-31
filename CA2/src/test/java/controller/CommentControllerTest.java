@@ -1,6 +1,7 @@
 package controller;
 
 import controllers.CommentController;
+import defines.Errors;
 import exceptions.NotExistentComment;
 import model.Comment;
 import org.junit.jupiter.api.AfterEach;
@@ -33,6 +34,7 @@ public class CommentControllerTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
         commentController = new CommentController();
+        commentController.setBaloot(baloot);
     }
     @AfterEach
     public void cleanUp() {
@@ -46,26 +48,27 @@ public class CommentControllerTest {
         Map<String, String> requestBody = new HashMap<>();
         requestBody.put("username", "user1");
         int commentId = 1;
+
         when(baloot.getCommentById(commentId)).thenReturn(comment);
-        doNothing().when(comment).addUserVote("user1", "like");
-        ResponseEntity<String> response = commentController.likeComment("1", requestBody);
+        doNothing().when(comment).addUserVote(requestBody.get("username"), "like");
+        ResponseEntity<String> response = commentController.likeComment(Integer.toString(commentId), requestBody);
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("The comment was successfully liked!", response.getBody());
     }
 
-    // Todo test_likeComment_NotFound()
+    @Test
+    public void test_likeComment_NotFound() throws NotExistentComment {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", "user1");
+        int commentId = 1;
 
-//    @Test
-//    public void test_likeComment_NotFound() throws NotExistentComment {
-//        Map<String, String> requestBody = new HashMap<>();
-//        int commentId = 1;
-//
-//        when(baloot.getCommentById(commentId)).thenThrow(new NotExistentComment());
-//        ResponseEntity<String> response = null;
-//        response = commentController.likeComment("1", requestBody);
-//
-//
-//    }
+        when(baloot.getCommentById(commentId)).thenThrow(new NotExistentComment());
+        ResponseEntity<String> response = commentController.likeComment(Integer.toString(commentId), requestBody);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(Errors.NOT_EXISTENT_COMMENT, response.getBody());
+    }
 
     @Test
     public void test_dislikeComment_success() throws NotExistentComment {
@@ -74,28 +77,25 @@ public class CommentControllerTest {
         int commentId = 1;
 
         when(baloot.getCommentById(commentId)).thenReturn(comment);
-        doNothing().when(comment).addUserVote("user1", "dislike");
-
-        ResponseEntity<String> response = commentController.dislikeComment("1", requestBody);
+        doNothing().when(comment).addUserVote(requestBody.get("username"), "dislike");
+        ResponseEntity<String> response = commentController.dislikeComment(Integer.toString(commentId), requestBody);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("The comment was successfully disliked!", response.getBody());
     }
-    // Todo test_dislikeComment_NotFound()
-//    @Test
-//    public void test_dislikeComment_NotFound() throws NotExistentComment {
-//        Map<String, String> requestBody = new HashMap<>();
-//        int commentId = 1;
-//
-//        when(baloot.getCommentById(commentId)).thenThrow(new NotExistentComment());
-//
-//        doThrow(new NotExistentComment()).when(comment).addUserVote("user1", "dislike");
-//
-//        ResponseEntity<String> response = commentController.dislikeComment("1", requestBody);
-//
-//        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-//        assertEquals("Comment not found", response.getBody());
-//    }
+
+    @Test
+    public void test_dislikeComment_NotFound() throws NotExistentComment {
+        Map<String, String> requestBody = new HashMap<>();
+        requestBody.put("username", "user1");
+        int commentId = 1;
+
+        when(baloot.getCommentById(commentId)).thenThrow(new NotExistentComment());
+        ResponseEntity<String> response = commentController.dislikeComment(Integer.toString(commentId), requestBody);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(Errors.NOT_EXISTENT_COMMENT, response.getBody());
+    }
 }
 
 
