@@ -137,10 +137,11 @@ public class CommoditiesControllerTest {
         String commodityId = "1";
         Map<String, String> requestBody = Map.of("username", "user1", "comment", "comment1");
 
+        when(baloot.generateCommentId()).thenReturn(1);
+
         User sampleUser = new User("user1", "password1", "email@gmail.com", "2000-01-01", "address1");
         when(baloot.getUserById("user1")).thenReturn(sampleUser);
 
-        when(baloot.generateCommentId()).thenReturn(1);
         doNothing().when(baloot).addComment(any(Comment.class));
         ResponseEntity<String> response = commoditiesController.addCommodityComment(commodityId, requestBody);
 
@@ -148,8 +149,19 @@ public class CommoditiesControllerTest {
         assertEquals("comment added successfully!", response.getBody());
     }
 
-   // Todo - addCommodityComment exception
+    @Test
+    public void test_addCommodityComment_NotExistentUser() throws NotExistentUser {
+        String commodityId = "1";
+        Map<String, String> requestBody = Map.of("username", "user1", "comment", "comment1");
 
+        when(baloot.generateCommentId()).thenReturn(1);
+        when(baloot.getUserById("user1")).thenThrow(new NotExistentUser());
+
+        ResponseEntity<String> response = commoditiesController.addCommodityComment(commodityId, requestBody);
+
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+        assertEquals(Errors.NOT_EXISTENT_USER, response.getBody());
+    }
 
     @Test
     public void test_getCommodityComment() {
