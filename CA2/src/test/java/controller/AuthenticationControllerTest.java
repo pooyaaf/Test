@@ -49,8 +49,8 @@ public class AuthenticationControllerTest {
         doNothing().when(baloot).login(anyString(), anyString());
         ResponseEntity<String> response = authenticationController.login(input);
 
-        assertEquals(response.getBody(),"login successfully!");
-        assertEquals(response.getStatusCode(),HttpStatus.OK);
+        assertEquals(response.getBody(), "login successfully!");
+        assertEquals(response.getStatusCode(), HttpStatus.OK);
     }
 
     @Test
@@ -63,7 +63,7 @@ public class AuthenticationControllerTest {
         ResponseEntity<String> response = authenticationController.login(input);
 
         assertEquals(response.getBody(), Errors.INCORRECT_PASSWORD);
-        assertEquals(response.getStatusCode(),HttpStatus.UNAUTHORIZED);
+        assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
     }
 
     @Test
@@ -72,13 +72,11 @@ public class AuthenticationControllerTest {
         input.put("username", "nonExistentUser");
         input.put("password", "password");
 
-        // Mock the login method to throw NotExistentUser
-        doThrow(new NotExistentUser()).when(baloot).login("nonExistentUser", "password");
-
+        doThrow(new NotExistentUser()).when(baloot).login(input.get("username"), input.get("password"));
         ResponseEntity<String> response = authenticationController.login(input);
 
-        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-        assertEquals("User does not exist.", response.getBody());
+        assertEquals(response.getBody(), Errors.NOT_EXISTENT_USER);
+        assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
     }
 
 
