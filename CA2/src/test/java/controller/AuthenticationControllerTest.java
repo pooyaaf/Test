@@ -49,8 +49,8 @@ public class AuthenticationControllerTest {
         doNothing().when(baloot).login(anyString(), anyString());
         ResponseEntity<String> response = authenticationController.login(input);
 
-        assertEquals(response.getBody(), "login successfully!");
-        assertEquals(response.getStatusCode(), HttpStatus.OK);
+        assertEquals("login successfully!", response.getBody());
+        assertEquals(HttpStatus.OK, response.getStatusCode());
     }
 
     @Test
@@ -62,8 +62,8 @@ public class AuthenticationControllerTest {
         doThrow(new IncorrectPassword()).when(baloot).login(input.get("username"), input.get("password"));
         ResponseEntity<String> response = authenticationController.login(input);
 
-        assertEquals(response.getBody(), Errors.INCORRECT_PASSWORD);
-        assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
+        assertEquals(Errors.INCORRECT_PASSWORD, response.getBody());
+        assertEquals(HttpStatus.UNAUTHORIZED, response.getStatusCode());
     }
 
     @Test
@@ -75,8 +75,8 @@ public class AuthenticationControllerTest {
         doThrow(new NotExistentUser()).when(baloot).login(input.get("username"), input.get("password"));
         ResponseEntity<String> response = authenticationController.login(input);
 
-        assertEquals(response.getBody(), Errors.NOT_EXISTENT_USER);
-        assertEquals(response.getStatusCode(), HttpStatus.NOT_FOUND);
+        assertEquals(Errors.NOT_EXISTENT_USER, response.getBody());
+        assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
     }
 
 
@@ -90,12 +90,12 @@ public class AuthenticationControllerTest {
         input.put("password", "password");
 
         doNothing().when(baloot).addUser(any(User.class));
-
         ResponseEntity<String> response = authenticationController.signup(input);
 
         assertEquals(HttpStatus.OK, response.getStatusCode());
         assertEquals("signup successfully!", response.getBody());
     }
+
 //  Todo - testSignupUsernameTaken
 
 
