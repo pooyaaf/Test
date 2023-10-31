@@ -131,6 +131,18 @@ public class CommoditiesControllerTest {
     }
 
     @Test
+    public void test_rateCommodity_OutOfRange() throws NotExistentCommodity {
+        String commodityId = "1";
+        Map<String, String> requestBody = Map.of("username", "user1", "rate", "12");
+
+        when(baloot.getCommodityById(commodityId)).thenReturn(new Commodity());
+        ResponseEntity<String> response = commoditiesController.rateCommodity(commodityId, requestBody);
+
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals("Score must be between 1 and 10", response.getBody());
+    }
+
+    @Test
     public void test_addCommodityComment_success() throws NotExistentUser {
         String commodityId = "1";
         Map<String, String> requestBody = Map.of("username", "user1", "comment", "comment1");
