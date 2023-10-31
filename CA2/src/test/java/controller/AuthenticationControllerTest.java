@@ -67,7 +67,7 @@ public class AuthenticationControllerTest {
     }
 
     @Test
-    void test_loginNotExistentUser_exception_NotExistentUser() throws NotExistentUser, IncorrectPassword {
+    void test_login_exception_NotExistentUser() throws NotExistentUser, IncorrectPassword {
         Map<String, String> input = new HashMap<>();
         input.put("username", "nonExistentUser");
         input.put("password", "password");
@@ -96,8 +96,20 @@ public class AuthenticationControllerTest {
         assertEquals("signup successfully!", response.getBody());
     }
 
-//  Todo - testSignupUsernameTaken
+    @Test
+    void test_signup_exception_UsernameAlreadyTaken() throws UsernameAlreadyTaken {
+        Map<String, String> input = new HashMap<>();
+        input.put("address", "123 Main St");
+        input.put("birthDate", "1990-01-01");
+        input.put("email", "user@example.com");
+        input.put("username", "username_already_taken");
+        input.put("password", "password");
 
+        doThrow(new UsernameAlreadyTaken()).when(baloot).addUser(any(User.class));
+        ResponseEntity<String> response = authenticationController.signup(input);
 
+        assertEquals(HttpStatus.BAD_REQUEST, response.getStatusCode());
+        assertEquals(Errors.USERNAME_ALREADY_TAKEN, response.getBody());
+    }
 
 }
