@@ -35,7 +35,9 @@ public class CommoditiesControllerTest {
     void setup() {
         MockitoAnnotations.openMocks(this);
         commoditiesController = new CommoditiesController();
+        commoditiesController.setBaloot(baloot);
     }
+
     @AfterEach
     public void cleanUp() {
         commoditiesController = null;
@@ -58,8 +60,9 @@ public class CommoditiesControllerTest {
 
         when(baloot.getCommodities()).thenReturn(sampleCommodities);
         ResponseEntity<ArrayList<Commodity>> response = commoditiesController.getCommodities();
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        assertEquals(sampleCommodities.size(), response.getBody().size());
+        assertEquals(sampleCommodities, response.getBody());
     }
 
     @Test
@@ -69,23 +72,21 @@ public class CommoditiesControllerTest {
         sampleCommodity.setId(commodityId);
 
         when(baloot.getCommodityById(commodityId)).thenReturn(sampleCommodity);
-
         ResponseEntity<Commodity> response = commoditiesController.getCommodity(commodityId);
+
         assertEquals(HttpStatus.OK, response.getStatusCode());
-        // Todo - add assertEquals for check sampleCommodity, response.getBody()
+        assertEquals(sampleCommodity, response.getBody());
     }
 
     @Test
     public void test_getCommodity_NotExistentCommodity() throws NotExistentCommodity {
         String commodityId = "NotExistentCommodity";
-        CommoditiesController sampleCommoditiesController = mock(CommoditiesController.class);
-        when(baloot.getCommodityById(commodityId)).thenAnswer(invocation -> {
-            throw new NotExistentCommodity();
-        });
+
+        when(baloot.getCommodityById(commodityId)).thenThrow(new NotExistentCommodity());
         ResponseEntity<Commodity> response = commoditiesController.getCommodity(commodityId);
+
         assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
         assertNull(response.getBody());
-
     }
 
     @Test
