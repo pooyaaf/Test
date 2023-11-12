@@ -24,8 +24,26 @@ public class EngineTest {
     }
 
     @Test
-    public void testGetAverageOrderQuantityByCustomer_NoOrders() {
+    public void testGetAverageOrderQuantityByCustomer_HistoryEmpty() {
         Assertions.assertEquals(0, engine.getAverageOrderQuantityByCustomer(1));
+    }
+
+    @Test
+    public void testGetAverageOrderQuantityByCustomer_NoOrders() {
+        int ID_customer = 1;
+        int ID_customer2 = 2;
+
+        Order order1 = new Order();
+        order1.setCustomer(ID_customer2);
+        Order order2 = new Order();
+        order2.setCustomer(ID_customer2);
+
+        engine.orderHistory.add(order1);
+        engine.orderHistory.add(order2);
+
+        Assertions.assertThrows(ArithmeticException.class, () -> {
+            engine.getAverageOrderQuantityByCustomer(ID_customer);
+        });
     }
 
     @Test

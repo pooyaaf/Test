@@ -25,6 +25,11 @@ public class Engine {
             return 0;
         }
 
+        // Added to fix divide by zero error
+        if (count == 0) {
+            throw new ArithmeticException("Cannot divide by zero");
+        }
+
         return sum / count;
     }
 
