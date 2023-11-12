@@ -41,9 +41,7 @@ public class EngineTest {
         engine.orderHistory.add(order1);
         engine.orderHistory.add(order2);
 
-        Assertions.assertThrows(ArithmeticException.class, () -> {
-            engine.getAverageOrderQuantityByCustomer(ID_customer);
-        });
+        Assertions.assertThrows(ArithmeticException.class, () -> engine.getAverageOrderQuantityByCustomer(ID_customer));
     }
 
     @Test
