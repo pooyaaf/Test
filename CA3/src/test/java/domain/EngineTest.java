@@ -13,6 +13,7 @@ public class EngineTest {
     void setUp() {
         engine = new Engine();
     }
+
     @AfterEach
     void tearDown() {
         engine = null;
@@ -190,5 +191,60 @@ public class EngineTest {
         order.setQuantity(5);
 
         Assertions.assertEquals(0, engine.getCustomerFraudulentQuantity(order));
+    }
+
+    @Test
+    public void testAddOrderAndGetFraudulentQuantity_OrderAlreadyExists() {
+        int ID_order = 1;
+
+        Order order1 = new Order();
+        order1.setId(ID_order);
+        order1.setQuantity(10);
+
+        engine.orderHistory.add(order1);
+
+        Order order = new Order();
+        order.setId(ID_order);
+        order.setQuantity(5);
+
+        Assertions.assertEquals(0, engine.addOrderAndGetFraudulentQuantity(order));
+    }
+
+    @Test
+    public void testAddOrderAndGetFraudulentQuantity_MoreThanAverage() {
+
+        Order order = new Order();
+        order.setCustomer(1);
+        order.setQuantity(5);
+
+        Assertions.assertEquals(5, engine.addOrderAndGetFraudulentQuantity(order));
+    }
+
+    @Test
+    public void testAddOrderAndGetFraudulentQuantity_LessThanAverage() {
+        int ID_customer = 1;
+
+        Order order1 = new Order();
+        order1.setId(0);
+        order1.setCustomer(ID_customer);
+        order1.setQuantity(10);
+        order1.setPrice(10);
+
+        Order order2 = new Order();
+        order2.setId(1);
+        order2.setCustomer(ID_customer);
+        order2.setQuantity(4);
+        order2.setPrice(14);
+
+        engine.orderHistory.add(order1);
+        engine.orderHistory.add(order2);
+
+        Order order = new Order();
+        order.setId(2);
+        order.setCustomer(ID_customer);
+        order.setQuantity(5);
+        order.setPrice(16);
+
+        Assertions.assertEquals(0, engine.addOrderAndGetFraudulentQuantity(order));
     }
 }
