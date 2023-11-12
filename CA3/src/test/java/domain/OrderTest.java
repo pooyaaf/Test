@@ -14,6 +14,9 @@ class OrderTest {
     void setup() {
         order = new Order();
         order.setId(1);
+        order.setCustomer(1);
+        order.setPrice(100);
+        order.setQuantity(10);
     }
 
     @AfterEach
@@ -38,5 +41,20 @@ class OrderTest {
     @Test
     void testEquals_IsNotOrder() {
         assertFalse(order.equals(new Object()));
+    }
+
+    @Test
+    void testGetId() {
+        assertEquals(1, order.getId());
+    }
+
+    @Test
+    void testGetCustomer() {
+        assertEquals(1, order.getCustomer());
+    }
+
+    @Test
+    void testGetPrice() {
+        assertEquals(100, order.getPrice());
     }
 }
