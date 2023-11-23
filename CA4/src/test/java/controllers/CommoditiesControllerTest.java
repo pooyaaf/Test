@@ -116,80 +116,70 @@ public class CommoditiesControllerTest {
 
     @Test
     void WHEN_get_commodities_THEN_give_same_as_json_object() throws Exception {
-        //setup
+
         when(baloot.getCommodities()).thenReturn(initCommodities);
 
-        //exercise
+
         MvcResult result = mockMvc.perform(get(COMMODITIES_BASE_URL)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
         ArrayList<Commodity> actual = gson.fromJson(content, new TypeToken<ArrayList<Commodity>>() {}.getType());
 
-        //verify
+
         Assertions.assertEquals(initCommodities.size(), actual.size());
         for (int i = 0; i < initCommodities.size(); i++)
             assertThat(actual.get(i))
                     .usingRecursiveComparison()
                     .isEqualTo(initCommodities.get(i));
 
-        //teardown
     }
 
     @Test
     void WHEN_get_single_commodity_THEN_give_same_as_json_object() throws Exception {
-        //setup
+
         String commodityId = "1";
         when(baloot.getCommodityById(any())).thenReturn(initCommodities.get(0));
 
-        //exercise
+
         String action = COMMODITIES_BASE_URL + ID_PATH_VARIABLE_URL;
         MvcResult result = mockMvc.perform(get(action, commodityId)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
         Commodity actual = gson.fromJson(content, Commodity.class);
-        //verify
+
         assertThat(actual)
                 .usingRecursiveComparison()
                 .isEqualTo(initCommodities.get(0));
 
-        //teardown
     }
 
     @Test
     void WHEN_get_single_commodity_id_is_invalid_THEN_get_no_existent_commodity() throws Exception {
-        //setup
+
         String commodityId = "1";
         doThrow(new NotExistentCommodity()).when(baloot).getCommodityById(any());
 
-        //exercise
         String action = COMMODITIES_BASE_URL +"{id}";
         MvcResult result = mockMvc.perform(get(action, commodityId)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isNotFound())
 
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        //verify
         assertNull(commoditiesController.getCommodity(commodityId).getBody());
         assertEquals(HttpStatus.NOT_FOUND, commoditiesController.getCommodity(commodityId).getStatusCode());
-
-        //teardown
     }
 
     @ParameterizedTest
     @MethodSource("populateCommodityRatingScenario")
     void WHEN_new_or_prev_user_vote_THEN_respectively_add_change_rating(Commodity c, String username, int newVote) throws Exception {
-        //setup
         int ratingCount = c.getUserRate().size() +1;
         float sumBeforeVote = c.getRating() * ratingCount;
         float expectedRate = 0;
@@ -201,7 +191,6 @@ public class CommoditiesControllerTest {
 
         when(baloot.getCommodityById(any())).thenReturn(c);
 
-        //exercise
         if (c.getUserRate().containsKey(username))
             expectedRate = (sumBeforeVote - c.getUserRate().get(username) + newVote)/(ratingCount);
         else
@@ -219,21 +208,17 @@ public class CommoditiesControllerTest {
         MvcResult result = mockMvc.perform(post("/commodities/{id}/rate", "1")
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        //verify
         assertEquals(expectedRate, actualRate);
         assertEquals("rate added successfully!", content);
-        //teardown
 
     }
 
     @Test
     void WHEN_voting_on_invalid_commodity_id_THEN_get_no_existent_commodity() throws Exception {
-        //setup
         String commodityId = "-1";
         Map<String, String> input = new HashMap<String, String>(){{
             put("rate", "0");
@@ -246,26 +231,21 @@ public class CommoditiesControllerTest {
 
         doThrow(new NotExistentCommodity()).when(baloot).getCommodityById(any());
 
-        //exercise
         String action = COMMODITIES_BASE_URL + ID_PATH_VARIABLE_URL + RATE_API_URL;
         MvcResult result = mockMvc.perform(post(action, commodityId)
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
 
-        //verify
 
-        //teardown
     }
 
     @ParameterizedTest
     @MethodSource("populateCommodityRating")
     void WHEN_voting_wrong_on_commodity_THEN_get_number_format_exception(String vote) throws Exception {
-        //setup
         String commodityId = "-1";
         Map<String, String> input = new HashMap<String, String>(){{
             put("rate", vote);
@@ -278,7 +258,6 @@ public class CommoditiesControllerTest {
 
         doThrow(new NumberFormatException()).when(baloot).getCommodityById(any());
 
-        //exercise
         String action = COMMODITIES_BASE_URL + ID_PATH_VARIABLE_URL + RATE_API_URL;
         MvcResult result = mockMvc.perform(post(action, commodityId)
                         .content(requestJson)
@@ -289,14 +268,10 @@ public class CommoditiesControllerTest {
 
         String content = result.getResponse().getContentAsString();
 
-        //verify
-
-        //teardown
     }
 
     @Test
     void WHEN_user_add_comment_THEN_commodity_comments_changes() throws Exception {
-        //setup
         String commodityId = "1";
         String username = "ryhn";
         Map<String, String> input = new HashMap<String, String>() {{
@@ -311,7 +286,6 @@ public class CommoditiesControllerTest {
         User u = new User(username, "1234", "ryhn@gmail.com", "2001-08-29", "teh");
         when(baloot.getUserById(any())).thenReturn(u);
 
-        //exercise
         String action = COMMODITIES_BASE_URL + ID_PATH_VARIABLE_URL + COMMENT_API_URL;
         MvcResult result = mockMvc.perform(post(action, commodityId)
                         .content(requestJson)
@@ -321,15 +295,12 @@ public class CommoditiesControllerTest {
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        //verify
         assertEquals(COMMENT_ADD_SUCCESSFULLY_FEEDBACK, content);
-        //teardown
 
     }
 
     @Test
     void WHEN_commodity_has_comments_THEN_get_comment_list_successfully() throws Exception {
-        //setup
         String commodityId = "1";
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date temp = new Date();
@@ -345,11 +316,9 @@ public class CommoditiesControllerTest {
 
         when(baloot.getCommentsForCommodity(anyInt())).thenReturn(cms);
 
-        //exercise
         String action = COMMODITIES_BASE_URL + ID_PATH_VARIABLE_URL + COMMENT_API_URL;
         MvcResult result = mockMvc.perform(get(action, commodityId)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -363,34 +332,26 @@ public class CommoditiesControllerTest {
                 .usingRecursiveComparison()
                 .isEqualTo(cms);
 
-        //teardown
     }
 
     @Test
     void WHEN_user_not_exist_in_adding_comment_THEN_get_not_existence_user() throws Exception {
-        //setup
         String commodityId = "1";
 
         doThrow(new NotExistentUser()).when(baloot).getUserById(any());
 
-        //exercise
         String action = COMMODITIES_BASE_URL + ID_PATH_VARIABLE_URL + COMMENT_API_URL;
         MvcResult result = mockMvc.perform(post(action, commodityId)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
 
-        //verify
-
-        //teardown
     }
 
     @Test
     void WHEN_search_category_THEN_same_category_commodities_return() throws Exception {
-        //setup
         Map<String, String> input = new HashMap<String, String>() {{
             put("searchOption", "category");
             put("searchValue", "phone");
@@ -404,12 +365,10 @@ public class CommoditiesControllerTest {
         when(baloot.filterCommoditiesByCategory(any())).thenReturn(initCommodities);
         when(baloot.filterCommoditiesByProviderName(any())).thenReturn(initCommodities);
 
-        //exercise
         String action = COMMODITIES_BASE_URL + SEARCH_API_URL;
         MvcResult result = mockMvc.perform(post(action)
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -419,27 +378,22 @@ public class CommoditiesControllerTest {
         objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
         ArrayList<Commodity> actual = objectMapper.readValue(content, new TypeReference<ArrayList<Commodity>>() {});
-        //verify
         assertThat(actual)
                 .usingRecursiveComparison()
                 .isEqualTo(initCommodities);
-        //teardown
 
     }
 
     @Test
     void WHEN_category_is_phone_THEN_suggest_phones() throws Exception {
-        //setup
         String commodityId = "1";
 
         when(baloot.getCommodityById(any())).thenReturn(initCommodities.get(0));
         when(baloot.suggestSimilarCommodities(any())).thenReturn(new ArrayList<>(List.of(initCommodities.get(1))));
 
-        //exercise
         String action = COMMODITIES_BASE_URL + ID_PATH_VARIABLE_URL + SUGGESTED_API_URL;
         MvcResult result = mockMvc.perform(get(action, commodityId)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
@@ -450,27 +404,22 @@ public class CommoditiesControllerTest {
 
         ArrayList<Commodity> actual = objectMapper.readValue(content, new TypeReference<ArrayList<Commodity>>() {});
 
-        //verify
         assertThat(actual)
                 .usingRecursiveComparison()
                 .isEqualTo(new ArrayList<>(List.of(initCommodities.get(1))));
-        //teardown
 
     }
 
     @Test
     void WHEN_commodity_does_not_exist_in_suggestion_THEN_not_existence_commodity() throws Exception {
-        //setup
         String commodityId = "1";
 
         doThrow(new NotExistentCommodity()).when(baloot).getCommodityById(any());
         when(baloot.suggestSimilarCommodities(any())).thenReturn(new ArrayList<>());
 
-        //exercise
         String action = COMMODITIES_BASE_URL + ID_PATH_VARIABLE_URL + SUGGESTED_API_URL;
         MvcResult result = mockMvc.perform(get(action, commodityId)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isNotFound())
                 .andReturn();
 
@@ -481,32 +430,28 @@ public class CommoditiesControllerTest {
 
         ArrayList<Commodity> actual = objectMapper.readValue(content, new TypeReference<ArrayList<Commodity>>() {});
 
-        //verify
-
-        //teardown
-
     }
 
     private static Stream<Arguments> populateCommodityRatingScenario(){
-        ratingCommodity.addRate("ryhn", 5);
+        ratingCommodity.addRate("user1", 5);
         Commodity addFirstUser = ratingCommodity;
-        ratingCommodity.addRate("mhya", 8);
+        ratingCommodity.addRate("user2", 8);
         Commodity addSecUser = ratingCommodity;
-        ratingCommodity.addRate("ryhn", 6);
+        ratingCommodity.addRate("user1", 6);
         Commodity changeFirstUser = ratingCommodity;
-        ratingCommodity.addRate("ryhnAp", 7);
+        ratingCommodity.addRate("user2", 7);
         Commodity addThirdUser = ratingCommodity;
-        ratingCommodity.addRate("mhya", 6);
+        ratingCommodity.addRate("user1", 6);
         Commodity changeSecUser = ratingCommodity;
-        ratingCommodity.addRate("mahya", 7);
+        ratingCommodity.addRate("user1", 7);
         Commodity addFourthUser = ratingCommodity;
         return Stream.of(
-                Arguments.of(addFirstUser, "ryhn", 5),
-                Arguments.of(addSecUser, "mhya", 8),
-                Arguments.of(changeFirstUser, "ryhn", 6),
-                Arguments.of(addThirdUser, "ryhnAp", 7),
-                Arguments.of(changeSecUser, "mhya", 6),
-                Arguments.of(addFourthUser, "mahya", 7)
+                Arguments.of(addFirstUser, "user2", 5),
+                Arguments.of(addSecUser, "user1", 8),
+                Arguments.of(changeFirstUser, "user2", 6),
+                Arguments.of(addThirdUser, "user2", 7),
+                Arguments.of(changeSecUser, "user1", 6),
+                Arguments.of(addFourthUser, "user1", 7)
         );
     }
 

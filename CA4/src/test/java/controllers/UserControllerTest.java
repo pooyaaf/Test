@@ -16,23 +16,18 @@ import org.junit.jupiter.api.extension.ExtendWith;
 
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.junit.jupiter.MockitoSettings;
 import org.mockito.quality.Strictness;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
-import org.springframework.test.context.junit.jupiter.SpringExtension;
+import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import service.Baloot;
 import com.google.gson.Gson;
@@ -42,6 +37,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -50,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyFloat;
-import static org.mockito.BDDMockito.given;
+
 import static org.mockito.Mockito.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -67,14 +63,13 @@ public class UserControllerTest {
     private UserController usersController;
     @Mock
     private Baloot baloot;
-    @Mock
-    private User balootUser;
 
+    @Mock
+    private User balootUsr;
     private MockMvc mockMvc;
 
     private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
     private static final File usersJsonFile = new File("src/test/java/resources/users.json").getAbsoluteFile();
-
     private static ArrayList<User> initUsers;
 
 
@@ -99,10 +94,6 @@ public class UserControllerTest {
         }
 
     }
-
-    @AfterAll
-    public static void teardown() {
-    }
     @BeforeEach
     void setUp() {
         mockMvc = MockMvcBuilders.standaloneSetup(usersController).build();
@@ -110,191 +101,143 @@ public class UserControllerTest {
 
     @AfterEach
     public void tearDown() {
+        Mockito.reset(baloot, balootUsr);
     }
 
     @Test
-    void GIVEN_incorrect_user_id_WHEN_get_user_THEN_get_no_existent_user() throws Exception {
-        //setup
-        String userId = "-1";
-        doThrow(new NotExistentUser()).when(baloot).getUserById(any());
-
-        //exercise
-        String action = USER_BASE_URL +"{id}";
+    void test_valid_user_success() throws Exception {
+        String userId = initUsers.get(0).getUsername();
+        when(baloot.getUserById(any())).thenReturn(initUsers.get(0));
+        String action = USER_BASE_URL + ID_PATH_VARIABLE_URL;
         MvcResult result = mockMvc.perform(get(action, userId)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-                .andExpect(status().isNotFound())
-
+                .andExpect(status().isOk())
                 .andReturn();
-
-        String content = result.getResponse().getContentAsString();
-        //verify
-        assertNull(usersController.getUser(userId).getBody());
-        assertEquals(HttpStatus.NOT_FOUND, usersController.getUser(userId).getStatusCode());
-
-        //teardown
-    }
-
-    @Test
-    void GIVEN_json_users_WHEN_users_are_valid_THEN_get_user_successfully() throws Exception {
-        for( User u : initUsers){
-            //setup
-            String userId = u.getUsername();
-
-            when(baloot.getUserById(any())).thenReturn(u);
-
-            //exercise
-            String action = USER_BASE_URL + ID_PATH_VARIABLE_URL;
-            MvcResult result = mockMvc.perform(get(action, userId)
-                            .contentType(MediaType.APPLICATION_JSON))
-                    //                .andDo(print())
-                    .andExpect(status().isOk())
-                    .andReturn();
-
             String content = result.getResponse().getContentAsString();
-
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
             User actual = objectMapper.readValue(content, new TypeReference<User>() {});
 
-            //verify
             assertThat(actual)
                     .usingRecursiveComparison()
-                    .isEqualTo(u);
-            //teardown
-        }
+                    .isEqualTo(initUsers.get(0));
     }
 
     @Test
-    void GIVEN_valid_credit_user_WHEN_add_credit_THEN_add_successfully() throws Exception {
-        //setup
+    void test_incorrect_user_id_expected_NotExistentUser() throws Exception {
+        String userId = "123";
+        when(baloot.getUserById(userId)).thenThrow(new NotExistentUser());
+        MvcResult result = mockMvc.perform(get("/users/{id}", userId)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isNotFound())
+                .andReturn();
+        assertNull(usersController.getUser(userId).getBody());
+        assertEquals(HttpStatus.NOT_FOUND, usersController.getUser(userId).getStatusCode());
+    }
+
+    @Test
+    void test_valid_credit_success_add() throws Exception {
         String userId = "1";
-
-        Map<String, String> input = new HashMap<String, String>(){{
-            put("credit", "0");
+        float creditToAdd = 100.0f;
+        Map<String, String> input = new HashMap<String, String>() {{
+            put("credit", String.valueOf(creditToAdd));
         }};
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson=ow.writeValueAsString(input);
 
-        doNothing().when(balootUser).addCredit(anyFloat());
-        when(baloot.getUserById(any())).thenReturn(balootUser);
+        doNothing().when(balootUsr).addCredit(creditToAdd);
+        when(baloot.getUserById(userId)).thenReturn(balootUsr);
 
-        //exercise
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        String requestJson=objectMapper.writeValueAsString(input);
+
         String action = USER_BASE_URL + ID_PATH_VARIABLE_URL + CREDIT_API_URL;
         MvcResult result = mockMvc.perform(post(action, userId)
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
                 .andExpect(status().isOk())
                 .andReturn();
 
         String content = result.getResponse().getContentAsString();
-        //verify
-        assertEquals(CREDIT_ADD_SUCCESSFULLY_FEEDBACK, usersController.addCredit(userId, input).getBody());
+        assertEquals(CREDIT_ADD_SUCCESSFULLY_FEEDBACK, content);
         assertEquals(HttpStatus.OK, usersController.addCredit(userId, input).getStatusCode());
-
-        //teardown
     }
 
+
     @Test
-    void GIVEN_invalid_credit_number_WHEN_add_credit_THEN_bad_request() throws Exception {
-        //setup
+    void test_invalid_range_add_creadit_bad_request_expected_InvalidCreditRange() throws Exception {
         String userId = "1";
+        float creditToAdd = 0;
+        Map<String, String> input = Collections.singletonMap("credit", String.valueOf(creditToAdd));
 
-        Map<String, String> input = new HashMap<String, String>(){{
-            put("credit", "0");
-        }};
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson=ow.writeValueAsString(input);
+        doThrow(new InvalidCreditRange()).when(balootUsr).addCredit(anyFloat());
+        when(baloot.getUserById(any())).thenReturn(balootUsr);
+        String requestJson = new ObjectMapper().writeValueAsString(input);
 
-        doNothing().when(balootUser).addCredit(anyFloat());
-        doThrow(new NumberFormatException()).when(baloot).getUserById(any());
-
-        //exercise
         String action = USER_BASE_URL + ID_PATH_VARIABLE_URL + CREDIT_API_URL;
         MvcResult result = mockMvc.perform(post(action, userId)
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
+
                 .andExpect(status().isBadRequest())
                 .andReturn();
 
-        String content = result.getResponse().getContentAsString();
-        //verify
-        assertEquals(CREDIT_INVALID_NUMBER_FEEDBACK, usersController.addCredit(userId, input).getBody());
-        assertEquals(HttpStatus.BAD_REQUEST, usersController.addCredit(userId, input).getStatusCode());
+        ResponseEntity<String> responseEntity = usersController.addCredit(userId, input);
+        assertEquals(CREDIT_INVALID_RANGE_FEEDBACK, responseEntity.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
 
-        //teardown
     }
 
     @Test
-    void GIVEN_invalid_credit_range_WHEN_add_credit_THEN_bad_request() throws Exception {
-        //setup
+    void test_user_not_found_exception_user_expected_NotExistentUser() throws Exception {
+
         String userId = "1";
+        Map<String, String> input = Collections.singletonMap("credit", "0");
 
-        Map<String, String> input = new HashMap<String, String>(){{
-            put("credit", "0");
-        }};
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson=ow.writeValueAsString(input);
+        String requestJson = new ObjectMapper().writeValueAsString(input);
 
-        doThrow(new InvalidCreditRange()).when(balootUser).addCredit(anyFloat());
-        when(baloot.getUserById(any())).thenReturn(balootUser);
-
-        //exercise
-        String action = USER_BASE_URL + ID_PATH_VARIABLE_URL + CREDIT_API_URL;
-        MvcResult result = mockMvc.perform(post(action, userId)
-                        .content(requestJson)
-                        .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
-                .andExpect(status().isBadRequest())
-                .andReturn();
-
-        String content = result.getResponse().getContentAsString();
-        //verify
-        assertEquals(CREDIT_INVALID_RANGE_FEEDBACK, usersController.addCredit(userId, input).getBody());
-        assertEquals(HttpStatus.BAD_REQUEST, usersController.addCredit(userId, input).getStatusCode());
-
-        //teardown
-    }
-
-    @Test
-    void GIVEN_invalid_user_WHEN_add_credit_THEN_user_not_found() throws Exception {
-        //setup
-        String userId = "1";
-
-        Map<String, String> input = new HashMap<String, String>(){{
-            put("credit", "0");
-        }};
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(SerializationFeature.WRAP_ROOT_VALUE, false);
-        ObjectWriter ow = mapper.writer().withDefaultPrettyPrinter();
-        String requestJson=ow.writeValueAsString(input);
-
-        doNothing().when(balootUser).addCredit(anyFloat());
+        doNothing().when(balootUsr).addCredit(anyFloat());
         doThrow(new NotExistentUser()).when(baloot).getUserById(any());
 
-        //exercise
+
         String action = USER_BASE_URL + ID_PATH_VARIABLE_URL + CREDIT_API_URL;
         MvcResult result = mockMvc.perform(post(action, userId)
                         .content(requestJson)
                         .contentType(MediaType.APPLICATION_JSON))
-//                .andDo(print())
+
                 .andExpect(status().isNotFound())
                 .andReturn();
 
-        String content = result.getResponse().getContentAsString();
-        //verify
-        assertEquals(CREDIT_USER_NOT_EXIST_FEEDBACK, usersController.addCredit(userId, input).getBody());
-        assertEquals(HttpStatus.NOT_FOUND, usersController.addCredit(userId, input).getStatusCode());
+        ResponseEntity<String> responseEntity = usersController.addCredit(userId, input);
+        assertEquals(CREDIT_USER_NOT_EXIST_FEEDBACK, responseEntity.getBody());
+        assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
 
-        //teardown
+    }
+    @Test
+    void test_invalid_credit_isBadRequest_expected_NumberFormatException() throws Exception {
+        String userId = "1";
+        float creditToAdd = -100.0f;
+        Map<String, String> input = new HashMap<String, String>(){{
+            put("credit", String.valueOf(creditToAdd));
+        }};
+
+        ObjectMapper objectMapper = new ObjectMapper();
+        String requestJson=objectMapper.writeValueAsString(input);
+
+        doNothing().when(balootUsr).addCredit(anyFloat());
+        doThrow(new NumberFormatException()).when(baloot).getUserById(any());
+
+        String action = USER_BASE_URL + ID_PATH_VARIABLE_URL + CREDIT_API_URL;
+        MvcResult result = mockMvc.perform(post(action, userId)
+                        .content(requestJson)
+                        .contentType(MediaType.APPLICATION_JSON))
+
+                .andExpect(status().isBadRequest())
+                .andReturn();
+
+        ResponseEntity<String> responseEntity = usersController.addCredit(userId, input);
+        assertEquals(CREDIT_INVALID_NUMBER_FEEDBACK, responseEntity.getBody());
+        assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
+
     }
 }
