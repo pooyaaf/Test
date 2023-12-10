@@ -27,5 +27,9 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+      with:
+        java-version: '19'
+        distribution: 'temurin'
+        cache: maven
       - name: Run tests with Maven
         run: mvn -B test --file pom.xml
