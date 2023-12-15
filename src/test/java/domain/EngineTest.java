@@ -21,16 +21,19 @@ public class EngineTest {
 
     @Test
     public void testEngine() {
+        engine = new Engine();
         Assertions.assertTrue(engine.orderHistory.isEmpty());
     }
 
     @Test
     public void testGetAverageOrderQuantityByCustomer_HistoryEmpty() {
+        engine = new Engine();
         Assertions.assertEquals(0, engine.getAverageOrderQuantityByCustomer(1));
     }
 
     @Test
     public void testGetAverageOrderQuantityByCustomer_NoOrders() {
+        engine = new Engine();
         int ID_customer = 1;
         int ID_customer2 = 2;
 
@@ -47,6 +50,7 @@ public class EngineTest {
 
     @Test
     public void testGetAverageOrderQuantityByCustomer_SomeOrders() {
+        engine = new Engine();
         int ID_customer = 1;
         int ID_customer2 = 2;
 
@@ -65,6 +69,7 @@ public class EngineTest {
 
     @Test
     public void testGetAverageOrderQuantityByCustomer_SomeOrders2() {
+        engine = new Engine();
         int ID_customer = 1;
         int ID_customer2 = 2;
 
@@ -87,11 +92,13 @@ public class EngineTest {
 
     @Test
     public void testGetQuantityPatternByPrice_NoOrders() {
+        engine = new Engine();
         Assertions.assertEquals(0, engine.getQuantityPatternByPrice(1));
     }
 
     @Test
     public void testGetQuantityPatternByPrice_WithoutSamePrice() {
+        engine = new Engine();
         int price = 15;
 
         Order order1 = new Order();
@@ -112,6 +119,7 @@ public class EngineTest {
 
     @Test
     public void testGetQuantityPatternByPrice_Wit1SamePrice() {
+        engine = new Engine();
         int price = 15;
 
         Order order1 = new Order();
@@ -133,6 +141,7 @@ public class EngineTest {
 
     @Test
     public void testGetQuantityPatternByPrice_WithMultipleSamePrice_SameQuantity() {
+        engine = new Engine();
         int price = 15;
 
         Order order1 = new Order();
@@ -160,6 +169,7 @@ public class EngineTest {
 
     @Test
     public void testGetQuantityPatternByPrice_WithMultipleSamePrice_DifferentQuantity() {
+        engine = new Engine();
         int price = 15;
 
         Order order1 = new Order();
@@ -186,6 +196,7 @@ public class EngineTest {
 
     @Test
     public void testGetCustomerFraudulentQuantity_MoreThanAverage() {
+        engine = new Engine();
         Order order1 = new Order();
         order1.setCustomer(1);
         order1.setQuantity(2);
@@ -201,6 +212,7 @@ public class EngineTest {
 
     @Test
     public void testGetCustomerFraudulentQuantity_LessThanAverage() {
+        engine = new Engine();
         int ID_customer = 1;
 
         Order order1 = new Order();
@@ -223,6 +235,7 @@ public class EngineTest {
 
     @Test
     public void testAddOrderAndGetFraudulentQuantity_OrderAlreadyExists() {
+        engine = new Engine();
         int ID_order = 1;
 
         Order order1 = new Order();
@@ -240,6 +253,7 @@ public class EngineTest {
 
     @Test
     public void testAddOrderAndGetFraudulentQuantity_MoreThanAverage() {
+        engine = new Engine();
 
         Order order = new Order();
         order.setCustomer(1);
@@ -250,6 +264,7 @@ public class EngineTest {
 
     @Test
     public void testAddOrderAndGetFraudulentQuantity_LessThanAverage() {
+        engine = new Engine();
         int ID_customer = 1;
 
         Order order1 = new Order();
